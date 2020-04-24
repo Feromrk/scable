@@ -1,9 +1,9 @@
-- name: testumgebung 1
+- name: testumgebung 2
   hosts: all
   gather_subset:
     - date_time
   vars:
-    output_file: "/tmp/mercedes_{{ ansible_facts.date_time.iso8601_basic_short }}.txt"
+    output_file: "/tmp/systemtest2_{{ ansible_facts.date_time.iso8601_basic_short }}.txt"
 
   tasks:
   - name: configure interfaces

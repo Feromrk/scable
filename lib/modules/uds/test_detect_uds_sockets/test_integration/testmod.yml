@@ -1,14 +1,19 @@
-- name: "first run isotp_scanner, then detect_uds_sockets"
+- name: "first run isotpscan, then detect_uds_sockets"
   connection: local
   hosts: localhost
   tasks:
-    - isotp_scanner:
+    - name: run an isotp scan
+      isotp_scanner:
         interface: vcan0
         scan_range_start: 0x600
         scan_range_end: 0x602
       register: isotpsocks
+    
+    - debug:
+        msg: "{{ isotpsocks }}"
 
-    - detect_uds_sockets:
+    - name: run the module to be tested
+      detect_uds_sockets:
         isotp_sockets: "{{ isotpsocks.sockets }}"
       register: testout
 
@@ -22,3 +27,31 @@
           - "{{ testout.sockets[0].did == 1793}}"
           - "{{ testout.sockets[0].sid == 1537}}"
           - "{{ testout.sockets[0].iface == 'vcan0'}}"
+
+- name: "first run wrong isotpscan, then detect_uds_sockets"
+  connection: local
+  hosts: localhost
+  tasks:
+    - name: run an isotp scan on wrong range
+      isotp_scanner:
+        interface: vcan0
+        scan_range_start: 0x200
+        scan_range_end: 0x202
+      register: isotpsocks
+    
+    - debug:
+        msg: "{{ isotpsocks }}"
+    
+    - assert:
+        that: "{{ isotpsocks.sockets|length == 0 }}"
+
+    - name: run the module to be tested
+      detect_uds_sockets:
+        isotp_sockets: "{{ isotpsocks.sockets }}"
+      register: testout
+
+    - debug:
+        msg: "{{ testout }}"
+        
+    - assert:
+        that: "{{ testout.sockets|length == 0 }}"

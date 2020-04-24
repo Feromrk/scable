@@ -1,0 +1,73 @@
+- name: "isotp_scanner, then detect_uds_sockets, then uds_scanner"
+  connection: local
+  hosts: localhost
+
+  tasks:
+    - name: scan for isotp sockets
+      isotp_scanner:
+        interface: vcan0
+        scan_range_start: 0x600
+        scan_range_end: 0x602
+      register: isotpsocks
+
+    - debug:
+        msg: "{{ isotpsocks }}"
+  
+    - name: test found sockets to get UDS sockets
+      detect_uds_sockets:
+        isotp_sockets: "{{ isotpsocks.sockets }}"
+      register: udssocks
+    
+    - debug:
+        msg: "{{ udssocks }}"
+  
+    - name: uds scan
+      uds_scanner:
+        isotp_sockets: "{{ udssocks.sockets }}"
+        session_range: 5
+      register: testout
+    
+    - debug:
+        msg: "{{ testout }}"
+
+    - assert:
+        that:
+          - "{{ testout.found_services == 0 }}"
+          - "{{ testout.found_sessions == 2 }}"
+  
+- name: "isotp_scanner on wrong range, then detect_uds_sockets, then uds_scanner"
+  connection: local
+  hosts: localhost
+
+  tasks:
+    - name: scan for isotp sockets
+      isotp_scanner:
+        interface: vcan0
+        scan_range_start: 0x100
+        scan_range_end: 0x102
+      register: isotpsocks
+
+    - debug:
+        msg: "{{ isotpsocks }}"
+  
+    - name: test found sockets to get UDS sockets
+      detect_uds_sockets:
+        isotp_sockets: "{{ isotpsocks.sockets }}"
+      register: udssocks
+    
+    - debug:
+        msg: "{{ udssocks }}"
+  
+    - name: uds scan
+      uds_scanner:
+        isotp_sockets: "{{ udssocks.sockets }}"
+        session_range: 5
+      register: testout
+    
+    - debug:
+        msg: "{{ testout }}"
+
+    - assert:
+        that:
+          - "{{ testout.found_services == 0 }}"
+          - "{{ testout.found_sessions == 0 }}"

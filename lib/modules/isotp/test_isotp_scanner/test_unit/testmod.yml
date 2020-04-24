@@ -1,0 +1,33 @@
+- name: correct input range
+  connection: local
+  hosts: localhost
+  tasks:
+  - isotp_scanner:
+      interface: vcan0
+      scan_range_start: 0x600
+      scan_range_end: 0x602
+    register: testout
+  - debug:
+      msg: '{{ testout }}'
+  - assert:
+      that:
+        - "{{ testout.sockets|length == 1}}"
+        - "{{ testout.sockets[0].basecls == 'ISOTP'}}"
+        - "{{ testout.sockets[0].did == 1793}}"
+        - "{{ testout.sockets[0].sid == 1537}}"
+        - "{{ testout.sockets[0].iface == 'vcan0'}}"
+
+- name: wrong input range
+  connection: local
+  hosts: localhost
+  tasks:
+  - isotp_scanner:
+      interface: vcan0
+      scan_range_start: 0x100
+      scan_range_end: 0x102
+    register: testout
+  - debug:
+      msg: '{{ testout }}'
+  - assert:
+      that:
+        - "{{ testout.sockets|length == 0}}"

@@ -1,0 +1,44 @@
+- name: testumgebung 2
+
+  hosts: 127.0.0.1
+  connection: local
+
+  gather_subset:
+    - date_time
+
+  vars:
+    output_file: "/tmp/systemtest2_{{ ansible_facts.date_time.iso8601_basic_short }}.txt"
+
+  tasks:
+  - import_tasks: restart_ecu.yml
+
+  - name: scan for ISOTPSockets
+    isotp_scanner:
+        interface: can0
+        scan_range_start: 0
+        scan_range_end: 0x7ff
+        out_file: "{{ output_file }}"
+        debug: yes
+    register: isotpsocks
+
+  - name: test found sockets to get the UDS endpoints
+    detect_uds_sockets:
+      isotp_sockets: "{{ isotpsocks.sockets }}"
+      service: ecu_reset
+      out_file: "{{ output_file }}"
+      debug: yes
+    register: udssocks
+
+  - name: check if udssockets present
+    fail: 
+      msg: No UDS sockets found
+    when: udssocks.sockets|length == 0
+
+  - import_tasks: restart_ecu.yml
+    
+  - name: UDS scan all found sockets
+    uds_scanner:
+      session_range: 0x100
+      isotp_sockets: "{{ udssocks.sockets }}"
+      out_file: "{{ output_file }}"
+      debug: yes

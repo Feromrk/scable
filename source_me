@@ -1,0 +1,18 @@
+#!/bin/bash
+
+#at first active venv, so this script installs stuff only there
+source "$PWD/venv/bin/activate"
+
+#let ansible find our modules 
+export ANSIBLE_LIBRARY="$ANSIBLE_LIBRARY:$PWD/lib/modules";
+
+#let ansible find our module_utils
+export ANSIBLE_MODULE_UTILS="$ANSIBLE_MODULE_UTILS:$PWD/lib/module_utils";
+
+#enable loging
+#export ANSIBLE_LOG_PATH="$HERE/lib/logs";
+
+#let ansible find our doc_fragments
+export ANSIBLE_DOC_FRAGMENT_PLUGINS="$ANSIBLE_DOC_FRAGMENT_PLUGINS:$PWD/lib/doc_fragments";
+
+echo 'now run: "ansible-doc -t module isotp_scanner" to check if ansible is working'

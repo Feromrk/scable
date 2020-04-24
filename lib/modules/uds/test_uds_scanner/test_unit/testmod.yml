@@ -1,0 +1,53 @@
+- name: correct input
+  connection: local
+  hosts: localhost
+
+  tasks:
+    - uds_scanner:
+        isotp_sockets: [
+          {
+              "basecls": "UDS",
+              "did": 1793,
+              "iface": "vcan0",
+              "listen_only": false,
+              "padding": true,
+              "sid": 1537
+          }
+        ]
+        session_range: 5
+      register: testout
+    
+    - debug:
+        msg: "{{ testout }}"
+
+    - assert:
+        that:
+          - "{{ testout.found_services == 0 }}"
+          - "{{ testout.found_sessions == 2 }}"
+
+- name: input socket with wrong IDs
+  connection: local
+  hosts: localhost
+
+  tasks:
+    - uds_scanner:
+        isotp_sockets: [
+          {
+              "basecls": "UDS",
+              "did": 123,
+              "iface": "vcan0",
+              "listen_only": false,
+              "padding": true,
+              "sid": 321
+          }
+        ]
+        session_range: 5
+      register: testout
+    
+    - debug:
+        msg: "{{ testout }}"
+
+    - assert:
+        that:
+          - "{{ testout.found_services == 0 }}"
+          - "{{ testout.found_sessions == 0 }}"

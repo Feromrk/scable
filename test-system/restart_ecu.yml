@@ -1,0 +1,19 @@
+- name: turn off ECU
+  shell: "ssh -i /home/gitlab-runner/.ssh/id_rsa pi@172.17.104.28 pixtendtool2l -do 7 0"
+  become: yes
+  register: pix
+  failed_when: "pix.rc != 0 and pix.rc != 13"
+
+- name: reset delay
+  pause:
+    seconds: 10
+
+- name: turn on ECU
+  shell: "ssh -i /home/gitlab-runner/.ssh/id_rsa pi@172.17.104.28 pixtendtool2l -do 7 1"
+  become: yes
+  register: pix
+  failed_when: "pix.rc != 0 and pix.rc != 13"
+
+- name: wait for ECU to restart
+  pause:
+    seconds: 5

@@ -1,0 +1,47 @@
+- name: correct input
+  connection: local
+  hosts: localhost
+  tasks:
+    - detect_uds_sockets:
+        isotp_sockets: [
+          {
+              "basecls": "ISOTP",
+              "did": 1793,
+              "extended_addr": null,
+              "extended_rx_addr": null,
+              "iface": "vcan0",
+              "listen_only": false,
+              "padding": true,
+              "sid": 1537
+          }
+        ]
+      register: testout
+    - debug:
+        msg: '{{ testout }}'
+    - assert:
+        that:
+          - "{{ testout.sockets|length == 1}}"
+          - "{{ testout.sockets[0].basecls == 'UDS'}}"
+          - "{{ testout.sockets[0].did == 1793}}"
+          - "{{ testout.sockets[0].sid == 1537}}"
+          - "{{ testout.sockets[0].iface == 'vcan0'}}"
+
+- name: wrong input
+  connection: local
+  hosts: localhost
+  tasks:
+    - detect_uds_sockets:
+        isotp_sockets: [
+          {
+              "basecls": "UDS",
+              "did": 123,
+              "iface": "vcan0",
+              "sid": 321
+          }
+        ]
+      register: testout
+    - debug:
+        msg: '{{ testout }}'
+    - assert:
+        that:
+          - "{{ testout.sockets|length == 0}}"

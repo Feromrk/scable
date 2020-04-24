@@ -9,6 +9,7 @@ put() {
 mainline_scapy() {
     cd /tmp
     git clone "https://github.com/secdev/scapy.git"
+    git checkout "744717193d1701fb1bc23219be7273022168c56d"
     cd "scapy"
     python3 "setup.py" install
     cd ..

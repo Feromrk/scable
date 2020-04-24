@@ -103,11 +103,7 @@ def load_scapy(isotp=True, uds=False):
     _load("scapy.utils")
 
 def is_basic_type(object):
-    return ( isinstance(object, str)
-        or isinstance(object, int) 
-        or isinstance(object, float) 
-        or isinstance(object, bool) 
-    )
+    return isinstance(object, (str, int, float, bool))
 
 def object_to_dict(object):
     '''

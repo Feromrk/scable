@@ -58,7 +58,7 @@ EXAMPLES = '''
   isotp_scanner:
     interface: can1
     scan_range_end: 0xf
-
+    out_file: /tmp/log.txt
 '''
 
 RETURN = '''

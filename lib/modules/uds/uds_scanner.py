@@ -200,7 +200,7 @@ def run_module():
                     make_lined_table(found_services, getTableEntry)
 
                 scapy_utils.debug("Starting session scan")
-                found_sessions = UDS_SessionEnumerator(sock, session_range=range(0, session_range))
+                found_sessions = UDS_SessionEnumerator(sock, session_range=range(0, session_range), reset_wait=0.5)
 
                 result['found_sessions'] += len(found_sessions)
 

@@ -1,22 +1,22 @@
 - name: testumgebung 1
-
-  hosts: 127.0.0.1
-  connection: local
-
+  hosts: all
   gather_subset:
     - date_time
-
   vars:
     output_file: "/tmp/systemtest1_{{ ansible_facts.date_time.iso8601_basic_short }}.txt"
 
   tasks:
+  - name: configure interfaces
+    shell: "ip link set can0 down && ip link set can0 txqueuelen 4000 && ip link set can0 up type can bitrate 500000"
+    become: yes
+
   - import_tasks: restart_ecu.yml
 
   - name: scan for ISOTPSockets
     isotp_scanner:
         interface: can0
-        scan_range_start: 0
-        scan_range_end: 0x7ff
+        scan_range_start: 0x600
+        scan_range_end: 0x700
         out_file: "{{ output_file }}"
         debug: yes
     register: isotpsocks
@@ -29,7 +29,7 @@
       debug: yes
     register: udssocks
 
-  - name: check if udssockets present
+  - name: check if udssockets were discovered
     fail: 
       msg: No UDS sockets found
     when: udssocks.sockets|length == 0
@@ -38,7 +38,7 @@
     
   - name: UDS scan all found sockets
     uds_scanner:
-      session_range: 0x100
+      session_range: 0x10
       isotp_sockets: "{{ udssocks.sockets }}"
       out_file: "{{ output_file }}"
       debug: yes

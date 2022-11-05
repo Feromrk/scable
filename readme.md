@@ -1,5 +1,5 @@
 # Scable
-Scable is a proof of concept that implements automotive security tests (written in Python with [Scapy](https://github.com/secdev/scapy)) as [Ansible Modules](https://github.com/ansible/ansible). The goal was to demonstrate module based security testing. 
+Scable is a proof of concept that implements automotive security tests (written in Python with [Scapy](https://github.com/secdev/scapy)) as [Ansible Modules](https://github.com/ansible/ansible). The goal was to demonstrate module based security testing as part of my master thesis.
 
 ## Requirements
 - Linux (Debian, Ubuntu, Manjaro etc.)
